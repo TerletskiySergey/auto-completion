@@ -12,14 +12,22 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+
+import com.epam.lab.auto_completion.trie.Trie;
 
 public class PrefixMatchesTest {
 
 	private static final String DIC_FILEPATH = "src/test/resources/dic.txt";
 	private static final String DELIMITER_REGEX = "\\s(?=[a-z])";
 
-	private PrefixMatches pm;
 	private static Map<String, String> dic;
+
+	@Mock
+	private Trie<Integer> trie;
+	@InjectMocks
+	private PrefixMatches pm;
 
 	@BeforeClass
 	public static void setupDic() throws IOException {
@@ -65,6 +73,8 @@ public class PrefixMatchesTest {
 	@Test
 	@Ignore
 	public void testSize() {
+
+		System.out.println("OK");
 		fail("Not yet implemented");
 	}
 

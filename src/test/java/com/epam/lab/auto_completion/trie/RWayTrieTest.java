@@ -66,7 +66,9 @@ public class RWayTrieTest {
 
 	@Test
 	public void test02AddSize_shouldIncreseSizeOnAddCall() {
+		assertEquals(dic.size(), trie.size());
 		trie = new RWayTrie<>();
+		assertEquals(0, trie.size());
 		int count = 0;
 		for (String str : dic.keySet()) {
 			trie.add(new Tuple<String>(str, EMPTY_STRING));
@@ -74,9 +76,15 @@ public class RWayTrieTest {
 		}
 	}
 
+	@Test
+	public void test03Size_emptyTrie_shouldBeZero() {
+		trie = new RWayTrie<>();
+		assertEquals(0, trie.size());
+	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	public void test03Add_invalidTuple_shouldNotIncreaseSize() {
+	public void test04Add_invalidTuple_shouldNotIncreaseSize() {
 		int alphHiBorder = ALPHABET_FIRST_LETTER_ASCII + ALPHABET_LENGTH;
 		for (char c = 0; c <= ASCII_END; c++) {
 			if (c <= alphHiBorder && c >= ALPHABET_FIRST_LETTER_ASCII) {
@@ -92,14 +100,14 @@ public class RWayTrieTest {
 	}
 
 	@Test
-	public void test04Contains_correctInput_shouldContain() {
+	public void test05Contains_correctInput_shouldContain() {
 		for (String str : dic.keySet()) {
 			assertTrue(trie.contains(str));
 		}
 	}
 
 	@Test
-	public void test05Contains_invalidInput_alwaysShouldNotContain() {
+	public void test06Contains_invalidInput_alwaysShouldNotContain() {
 		int alphHiBorder = ALPHABET_FIRST_LETTER_ASCII + ALPHABET_LENGTH;
 		for (char c = 0; c <= ASCII_END; c++) {
 			if (c <= alphHiBorder && c >= ALPHABET_FIRST_LETTER_ASCII) {
@@ -111,7 +119,7 @@ public class RWayTrieTest {
 	}
 
 	@Test
-	public void test06Delete_correctInput_shouldNotContainAfterDelete() {
+	public void test07Delete_correctInput_shouldNotContainAfterDelete() {
 		for (String str : dic.keySet()) {
 			assertTrue(trie.contains(str));
 			trie.delete(str);
@@ -120,16 +128,16 @@ public class RWayTrieTest {
 	}
 
 	@Test
-	public void test07DeleteSize_correctInput_shouldDecreaseSizeOnDeleteCall() {
+	public void test08DeleteSize_correctInput_shouldDecreaseSizeOnDeleteCall() {
+		int count = dic.size();
 		for (String str : dic.keySet()) {
-			assertTrue(trie.contains(str));
 			trie.delete(str);
-			assertFalse(trie.contains(str));
+			assertEquals(--count, trie.size());
 		}
 	}
 
 	@Test
-	public void test08Delete_invalidInput_alwaysShouldNotDelete() {
+	public void test09Delete_invalidInput_alwaysShouldNotDelete() {
 		int alphHiBorder = ALPHABET_FIRST_LETTER_ASCII + ALPHABET_LENGTH;
 		for (char c = 0; c <= ASCII_END; c++) {
 			if (c <= alphHiBorder && c >= ALPHABET_FIRST_LETTER_ASCII) {
@@ -144,7 +152,39 @@ public class RWayTrieTest {
 	}
 
 	@Test
-	public void test09Words_shouldFindAllReferenceWords() {
+	public void test10Delete_emptyTrie_shouldNotDeleteOrThrowException() {
+		trie = new RWayTrie<>();
+		try {
+			for (String str : dic.keySet()) {
+				trie.delete(str);
+				assertEquals(0, trie.size());
+			}
+		} catch (Exception ex) {
+			throw new AssertionError();
+		}
+	}
+
+	@Test
+	public void test11Delete_emptyTrie_incorrectInput_shouldNotDeleteOrThrowException() {
+		trie = new RWayTrie<>();
+		int alphHiBorder = ALPHABET_FIRST_LETTER_ASCII + ALPHABET_LENGTH;
+		try {
+			for (char c = 0; c <= ASCII_END; c++) {
+				if (c <= alphHiBorder && c >= ALPHABET_FIRST_LETTER_ASCII) {
+					continue;
+				}
+				trie.delete(String.valueOf(c));
+				assertEquals(0, trie.size());
+			}
+			trie.delete(null);
+			assertEquals(0, trie.size());
+		} catch (Exception ex) {
+			throw new AssertionError();
+		}
+	}
+
+	@Test
+	public void test12Words_shouldFindAllReferenceWords() {
 		List<String> toCheckList = (List<String>) trie.words();
 		assertEquals(dic.size(), toCheckList.size());
 		List<String> refList = new ArrayList<>(dic.keySet());
@@ -156,7 +196,14 @@ public class RWayTrieTest {
 	}
 
 	@Test
-	public void test10WordsWithPrefix_oneLetterPrefixWordsFromRefListShouldBeSame() {
+	public void test13Words_emptyTrie_shouldReturnEmptyData() {
+		trie = new RWayTrie<>();
+		List<String> toCheckList = (List<String>) trie.words();
+		assertEquals(0, toCheckList.size());
+	}
+
+	@Test
+	public void test14WordsWithPrefix_oneLetterPrefixWordsFromRefListShouldBeSame() {
 		List<String> refList = new ArrayList<>(dic.keySet());
 		List<String> refPrefixList = new ArrayList<>();
 		Collections.sort(refList);
@@ -178,7 +225,7 @@ public class RWayTrieTest {
 	}
 
 	@Test
-	public void test11WordsWithPrefix_invalidInput_alwaysShouldReturnEmptyData() {
+	public void test15WordsWithPrefix_invalidInput_alwaysShouldReturnEmptyData() {
 		List<String> toCheck = (List<String>) trie.wordsWithPrefix(null);
 		assertEquals(0, toCheck.size());
 		int alphHiBorder = ALPHABET_FIRST_LETTER_ASCII + ALPHABET_LENGTH;

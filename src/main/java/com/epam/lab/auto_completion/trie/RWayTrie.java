@@ -162,13 +162,4 @@ public class RWayTrie<T> implements Trie<T> {
 	public int size() {
 		return size;
 	}
-
-	public static void main(String[] arg) {
-
-		RWayTrie<Integer> trie = new RWayTrie<>();
-
-		for (String str : trie.wordsWithPrefix(null)) {
-			System.out.println(str);
-		}
-	}
 }

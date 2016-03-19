@@ -59,7 +59,6 @@ public class PrefixMatches {
 			}
 		}
 		return result;
-
 	}
 
 	public Iterable<String> wordsWithPrefix(String pref) {
