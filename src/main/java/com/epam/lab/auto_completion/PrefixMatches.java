@@ -3,7 +3,6 @@ package com.epam.lab.auto_completion;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.epam.lab.auto_completion.trie.RWayTrie;
 import com.epam.lab.auto_completion.trie.Trie;
 import com.epam.lab.auto_completion.trie.Trie.Tuple;
 
@@ -14,7 +13,16 @@ public class PrefixMatches {
 	private static final int MIN_WORD_LENGTH = 3;
 	private static final int DEFAULT_WORD_SET_LENGTH = 3;
 
-	private Trie<Integer> trie = new RWayTrie<>();
+	private Trie<Integer> trie;
+
+	public PrefixMatches(Trie<Integer> trie) {
+		super();
+		this.trie = trie;
+	}
+
+	public void setTrie(Trie<Integer> trie) {
+		this.trie = trie;
+	}
 
 	public int add(String... strings) {
 		int count = 0;
@@ -46,16 +54,14 @@ public class PrefixMatches {
 		List<String> result = new ArrayList<>();
 		if (pref.length() >= MIN_PREFIX_LENGTH && k > 0) {
 			int curLen = 0;
-			boolean isFirst = true;
 			for (String str : trie.wordsWithPrefix(pref)) {
-				if (isFirst) {
+				if (str.length() >= MIN_WORD_LENGTH) {
+					if (str.length() > curLen && --k == -1) {
+						break;
+					}
 					curLen = str.length();
-					isFirst = false;
-				} else if (str.length() > curLen && --k == 0) {
-					break;
+					result.add(str);
 				}
-				curLen = str.length();
-				result.add(str);
 			}
 		}
 		return result;
@@ -64,5 +70,4 @@ public class PrefixMatches {
 	public Iterable<String> wordsWithPrefix(String pref) {
 		return wordsWithPrefix(pref, DEFAULT_WORD_SET_LENGTH);
 	}
-
 }
