@@ -5,6 +5,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+/**
+ * The class is implementor of Trie-interface.
+ * 
+ * Provides methods to add, delete,
+ * 
+ *
+ * @author Sergey Terletskiy
+ * @version 1.0 03/18/2016
+ */
 public class RWayTrie<T> implements Trie<T> {
 
 	private static final int ALPHABET_LENGTH = 26;
