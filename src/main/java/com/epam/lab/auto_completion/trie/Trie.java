@@ -5,7 +5,10 @@ package com.epam.lab.auto_completion.trie;
  * duplicate keys; each key can map to at most one value. String values serve as
  * keys. Interface implementation infers that implementor class stores data in
  * string tree, so called 'trie', where key is not stored in tree node, but path
- * from the tree root to the tree node determines node key.
+ * from the tree root to the tree node determines node key. Interface provides
+ * methods for adding, deleting mappings, checking of mapping presence,
+ * returning of mappings quantity as well as of all the contained string keys
+ * and of all the contained string keys with specified prefix.
  * 
  * @param <T>
  *            - the type of mapped values
@@ -49,9 +52,10 @@ public interface Trie<T> {
 	}
 
 	/**
-	 * Associates the specified value with the specified key in this map
-	 * (optional operation). If the map previously contained a mapping for the
-	 * key, the old value is replaced by the specified value.
+	 * Associates the specified value with the specified key in this object. If
+	 * the object previously contained a mapping for the key, the old value is
+	 * replaced by the specified value. Specified value and key are encapsulated
+	 * in Tuple instance.
 	 * 
 	 * @param tuple
 	 *            - object encapsulating key with which the specified value is
