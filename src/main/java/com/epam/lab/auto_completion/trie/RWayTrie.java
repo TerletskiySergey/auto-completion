@@ -138,6 +138,8 @@ public class RWayTrie<T> implements Trie<T> {
 	 * 
 	 * @param word
 	 *            - key whose presence in this trie is to be tested
+	 * @return Boolean value indicating if the mapping exists for the specified
+	 *         key.
 	 */
 	public boolean contains(String word) {
 		if (isTermValid(word)) {
