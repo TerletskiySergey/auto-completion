@@ -1,6 +1,7 @@
 package com.epam.lab.auto_completion.trie;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -18,7 +19,6 @@ import java.util.Queue;
  * @version 1.0 03/18/2016
  */
 public class RWayTrie<T> implements Trie<T> {
-
 	/**
 	 * String tree alphabet length
 	 */
@@ -295,14 +295,10 @@ public class RWayTrie<T> implements Trie<T> {
 				for (int i = 0; i < ALPHABET_LENGTH; i++) {
 					if (curNode.next[i] != null) {
 						char curChar = (char) (i + ALPHABET_FIRST_LETTER_ASCII);
-						String curWord = curPrefix.concat(String.valueOf(curChar));
-						if (pref.length() >= curWord.length()) {
-							int index = curWord.length() - 1;
-							if (pref.charAt(index) != curWord.charAt(index)) {
-								continue;
-							}
+						if (curPrefix.length() < pref.length() && pref.charAt(curPrefix.length()) != curChar) {
+							continue;
 						}
-						wordQ.offer(curWord);
+						wordQ.offer(curPrefix.concat(String.valueOf(curChar)));
 						nodeQ.offer(curNode.next[i]);
 					}
 				}
