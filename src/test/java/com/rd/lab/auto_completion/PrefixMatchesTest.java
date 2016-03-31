@@ -1,8 +1,7 @@
-package com.epam.lab.auto_completion;
+package com.rd.lab.auto_completion;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.times;
@@ -13,9 +12,12 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import org.junit.Before;
@@ -28,8 +30,8 @@ import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.epam.lab.auto_completion.trie.RWayTrie;
-import com.epam.lab.auto_completion.trie.Trie.Tuple;
+import com.rd.lab.auto_completion.trie.RWayTrie;
+import com.rd.lab.auto_completion.trie.Trie.Tuple;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PrefixMatchesTest {
@@ -135,105 +137,87 @@ public class PrefixMatchesTest {
 	}
 
 	@Test
-	public void test05WordsWithPrefixString_argLessThenMinWordLength_shouldReturnEmptyData() {
+	public void test05WordsWithPrefixString_argLessThenMinPrefixLength_shouldReturnEmptyData() {
 		pm = new PrefixMatches(new RWayTrie<>());
 		for (String str : dic.keySet()) {
-			if (str.length() < MIN_WORD_LENGTH) {
+			if (str.length() < MIN_PREFIX_LENGTH) {
 				Iterable<String> result = pm.wordsWithPrefix(str);
 				assertFalse(result.iterator().hasNext());
 			}
 		}
 	}
 
-	@Test
-	public void test06WordsWithPrefixString_correctInput_shouldReturnDefaultNumberOfWordSets() {
-		trie = new RWayTrie<>();
-		for (String str : dic.keySet()) {
-			trie.add(new Tuple<Integer>(str, str.length()));
-		}
-		pm = new PrefixMatches(trie);
-		for (String str : dic.keySet()) {
-			if (str.length() >= MIN_PREFIX_LENGTH) {
-				List<String> trieResult = (List<String>) trie.wordsWithPrefix(str);
-				// Filtering reference collection from words with length less
-				// than
-				// MIN_WORD_LENGTH
-				for (int i = 0; i < trieResult.size(); i++) {
-					if (trieResult.get(i).length() < MIN_WORD_LENGTH) {
-						trieResult.remove(i);
-					} else {
-						break;
-					}
-				}
-				int lenCount = 0;
-				List<String> pmResult = (List<String>) pm.wordsWithPrefix(str);
-				// Estimating actual number of word sets
-				for (int i = 0, curLen = 0; i < pmResult.size(); i++) {
-					if (curLen < pmResult.get(i).length()) {
-						curLen = pmResult.get(i).length();
-						lenCount++;
-					}
-					assertEquals(trieResult.get(i), pmResult.get(i));
-				}
-				if (!pmResult.isEmpty()) {
-					assertTrue(lenCount >= 1);
-				}
-				assertTrue(lenCount <= DEFAULT_WORD_SET_LENGTH);
-			}
-		}
+	@Test(expected = NoSuchElementException.class)
+	public void test06WordsWithPrefixString_correctInput_emptyContainer_shouldReturnEmptyData() {
+		pm = new PrefixMatches(new RWayTrie<>());
+		Iterator<String> iter = pm.wordsWithPrefix("prefix").iterator();
+		assertFalse(iter.hasNext());
+		iter.next();
 	}
 
 	@Test
-	public void test07WordsWithPrefixStringInt_correctInput_shouldReturnAppropNumberOfWordSets() {
+	public void test07WordsWithPrefixString_correctInput_shouldReturnDefaultNumberOfWordSets() {
 		trie = new RWayTrie<>();
-		for (String str : dic.keySet()) {
-			trie.add(new Tuple<Integer>(str, str.length()));
-		}
 		pm = new PrefixMatches(trie);
-		for (String str : dic.keySet()) {
-			if (str.length() >= MIN_PREFIX_LENGTH) {
-				List<String> trieResult = (List<String>) trie.wordsWithPrefix(str);
-				int refLenCount = 0;
-				// Filtering reference collection from words with length less
-				// than MIN_WORD_LENGTH and estimating number of word sets in
-				// reference collection
-				for (int i = 0, curLen = 0; i < trieResult.size(); i++) {
-					if (trieResult.get(i).length() < MIN_WORD_LENGTH) {
-						trieResult.remove(i);
-						continue;
-					}
-					if (curLen < trieResult.get(i).length()) {
-						curLen = trieResult.get(i).length();
-						refLenCount++;
-					}
-				}
-				for (int i = 1; i <= refLenCount; i++) {
-					int lenCount = 0;
-					List<String> pmResult = (List<String>) pm.wordsWithPrefix(str, i);
-					// Estimating actual number of word sets
-					for (int j = 0, curLen = 0; j < pmResult.size(); j++) {
-						if (curLen < pmResult.get(j).length()) {
-							curLen = pmResult.get(j).length();
-							lenCount++;
-						}
-						assertEquals(trieResult.get(j), pmResult.get(j));
-					}
-					assertEquals(i, lenCount);
-				}
-			}
-		}
+		pm.add("abc", "abcd", "abcde", "abcdef");
+		List<String> toCheck = iterableToList(pm.wordsWithPrefix("abc"));
+		assertEquals("abc", toCheck.get(0));
+		assertEquals("abcd", toCheck.get(1));
+		assertEquals("abcde", toCheck.get(2));
+		assertEquals(DEFAULT_WORD_SET_LENGTH, toCheck.size());
+		toCheck = iterableToList(pm.wordsWithPrefix("abcd"));
+		assertEquals("abcd", toCheck.get(0));
+		assertEquals("abcde", toCheck.get(1));
+		assertEquals("abcdef", toCheck.get(2));
+		assertEquals(DEFAULT_WORD_SET_LENGTH, toCheck.size());
+		toCheck = iterableToList(pm.wordsWithPrefix("abcde"));
+		assertEquals("abcde", toCheck.get(0));
+		assertEquals("abcdef", toCheck.get(1));
+		assertEquals(DEFAULT_WORD_SET_LENGTH - 1, toCheck.size());
+		toCheck = iterableToList(pm.wordsWithPrefix("abcdef"));
+		assertEquals("abcdef", toCheck.get(0));
+		assertEquals(DEFAULT_WORD_SET_LENGTH - 2, toCheck.size());
 	}
 
 	@Test
-	public void test08WordsWithPrefixStringInt_invalidIntArg_shouldReturnEmptyData() {
+	public void test08WordsWithPrefixStringInt_correctInput_shouldReturnAppropNumberOfWordSets() {
 		trie = new RWayTrie<>();
-		for (String str : dic.keySet()) {
-			trie.add(new Tuple<Integer>(str, str.length()));
-		}
 		pm = new PrefixMatches(trie);
-		for (String str : dic.keySet()) {
-			assertEquals(0, ((List<String>) pm.wordsWithPrefix(str, -1)).size());
-			assertEquals(0, ((List<String>) pm.wordsWithPrefix(str, 0)).size());
+		pm.add("abc", "abcd", "abcde", "abcdef", "abcdefg");
+		List<String> toCheck = iterableToList(pm.wordsWithPrefix("abc", 3));
+		assertEquals("abc", toCheck.get(0));
+		assertEquals("abcd", toCheck.get(1));
+		assertEquals("abcde", toCheck.get(2));
+		assertEquals(3, toCheck.size());
+		toCheck = iterableToList(pm.wordsWithPrefix("abc", 4));
+		assertEquals("abc", toCheck.get(0));
+		assertEquals("abcd", toCheck.get(1));
+		assertEquals("abcde", toCheck.get(2));
+		assertEquals("abcdef", toCheck.get(3));
+		assertEquals(4, toCheck.size());
+		toCheck = iterableToList(pm.wordsWithPrefix("abc", 5));
+		assertEquals("abc", toCheck.get(0));
+		assertEquals("abcd", toCheck.get(1));
+		assertEquals("abcde", toCheck.get(2));
+		assertEquals("abcdef", toCheck.get(3));
+		assertEquals("abcdefg", toCheck.get(4));
+		assertEquals(5, toCheck.size());
+	}
+
+	@Test
+	public void test09WordsWithPrefixStringInt_invalidIntArg_shouldReturnEmptyData() {
+		trie = new RWayTrie<>();
+		pm = new PrefixMatches(trie);
+		pm.add("aaa");
+		assertFalse(pm.wordsWithPrefix("aaa", 0).iterator().hasNext());
+		assertFalse(pm.wordsWithPrefix("aaa", -1).iterator().hasNext());
+	}
+
+	private List<String> iterableToList(Iterable<String> iter) {
+		List<String> toReturn = new ArrayList<>();
+		for (String str : iter) {
+			toReturn.add(str);
 		}
+		return toReturn;
 	}
 }

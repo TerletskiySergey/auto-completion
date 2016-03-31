@@ -1,4 +1,4 @@
-package com.epam.lab.auto_completion.trie;
+package com.rd.lab.auto_completion.trie;
 
 /**
  * An object that maps keys to values. An object of interface cannot contain
